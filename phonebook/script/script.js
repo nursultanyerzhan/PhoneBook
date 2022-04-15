@@ -2,7 +2,7 @@
 
 const data = [
     {
-        name: 'Иван',
+        name: 'қИван',
         surname: 'Петров',
         phone: '+79514545454',
     },
@@ -17,7 +17,7 @@ const data = [
         phone: '+79800252525',
     },
     {
-        name: 'Мария',
+        name: 'аМария',
         surname: 'Попова',
         phone: '+79876543210',
     },
@@ -48,7 +48,7 @@ const data = [
         h1.textContent = `Телефонный справочник. ${title}`;
         return h1;
     };
-    
+
     const createLogoFooter = title => {
         const h1 = document.createElement('h1');
         h1.classList.add('logoFooter');
@@ -185,20 +185,23 @@ const data = [
         footer.footerContainer.append(logoFooter);
 
         main.mainContainer.append(buttonGroup.btnWrapper, table, form.overlay);
-        
+
         app.append(header, main, footer);
 
         return {
             list: table.tbody,
             logo,
             btnAdd: buttonGroup.btns[0],
+            btnDel: buttonGroup.btns[1],
             formOverlay: form.overlay,
             form: form.form,
+            table: table,
         }
     };
 
     const createRow = ({ name: firstName, surname, phone }) => {
         const tr = document.createElement('tr');
+        tr.classList.add('contact');
 
         const tdDel = document.createElement('td');
         tdDel.classList.add('delete');
@@ -221,7 +224,7 @@ const data = [
 
         const tdEdit = document.createElement('td');
         const editButton = document.createElement('button');
-        editButton.classList.add('btn','btn-warning');
+        editButton.classList.add('btn', 'btn-warning');
         editButton.textContent = 'редактировать';
         tdEdit.append(editButton);
 
@@ -247,11 +250,33 @@ const data = [
         });
     };
 
+    const sortTable = (table, column) => {
+        var rows, switching, i, x, y, shouldSwitch;
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[column];
+                y = rows[i + 1].getElementsByTagName("TD")[column];
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
     const init = (selectorApp, title) => {
         const app = document.querySelector(selectorApp);
         const phoneBook = renderPhoneBook(app, title);
 
-        const { list, logo,  btnAdd, formOverlay, form } = phoneBook;
+        const { list, logo, btnAdd, formOverlay, form, btnDel, table } = phoneBook;
         const allRow = renderContacts(list, data);
 
         hoverRow(allRow, logo);
@@ -263,8 +288,12 @@ const data = [
         form.addEventListener('click', event => {
             event.stopPropagation();
         });
-        
-        formOverlay.addEventListener('click', () => {
+
+        formOverlay.addEventListener('click', e => {
+            const target = e.target;
+            if (target === formOverlay || target.closest('.close')) {
+                formOverlay.classList.remove('is-visible');
+            }
             formOverlay.classList.remove('is-visible');
         });
 
@@ -281,6 +310,32 @@ const data = [
         const closeElem = document.querySelector('.close');
         closeElem.addEventListener('click', () => {
             formOverlay.classList.remove('is-visible');
+        });
+
+        btnDel.addEventListener('click', () => {
+            document.querySelectorAll('.delete').forEach(del => {
+                del.classList.toggle('is-visible');
+            });
+        });
+
+        list.addEventListener('click', e => {
+            const target = e.target;
+            if (target.closest('.del-icon')) {
+                target.closest('.contact').remove();
+            }
+        });
+
+        table.addEventListener('click', e => {
+            const target = e.target;
+
+            if (target.textContent === 'Имя') {
+                var table = document.querySelector('.table');
+                sortTable(table, 1);
+            }
+            if (target.textContent === 'Фамилия') {
+                var table = document.querySelector('.table');
+                sortTable(table, 2);
+            }
         });
     };
 
