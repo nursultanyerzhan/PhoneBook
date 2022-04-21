@@ -1,32 +1,27 @@
 'use strict';
 
-const data = [
-    {
-        name: 'қИван',
-        surname: 'Петров',
-        phone: '+79514545454',
-    },
-    {
-        name: 'Игорь',
-        surname: 'Семёнов',
-        phone: '+79999999999',
-    },
-    {
-        name: 'Семён',
-        surname: 'Иванов',
-        phone: '+79800252525',
-    },
-    {
-        name: 'аМария',
-        surname: 'Попова',
-        phone: '+79876543210',
-    },
-];
-
 {
-    const addContactData = contact => {
-        data.push(contact);
+    const getStorage = (key) => {
+        const data = JSON.parse(localStorage.getItem(key));
+        return data ?? [];
     };
+    
+    const setStorage = (key, contact) => {
+        const dataFromStorage = getStorage(key);
+        dataFromStorage.push(contact);
+        localStorage.setItem(key, JSON.stringify(dataFromStorage));
+    };
+
+    const removeStorage = (key, phone) => {
+        const contacts = getStorage(key);
+        const filteredContacts = contacts.filter(item => item.phone != phone);
+        localStorage.setItem(key, JSON.stringify(filteredContacts));
+    };
+
+    const addContactData = contact => {
+        setStorage('contactKey', contact);
+    };
+
     const createContainer = () => {
         const container = document.createElement('div');
         container.classList.add('container');
@@ -254,6 +249,7 @@ const data = [
     };
 
     const sortTable = (table, column) => {
+        localStorage.setItem('sortColumnInfo', column);
         var rows, switching, i, x, y, shouldSwitch;
         switching = true;
         while (switching) {
@@ -309,6 +305,8 @@ const data = [
         list.addEventListener('click', e => {
             const target = e.target;
             if (target.closest('.del-icon')) {
+                const phoneNumber = target.closest('.contact').children[3].textContent
+                removeStorage('contactKey', phoneNumber);
                 target.closest('.contact').remove();
             }
         });
@@ -330,11 +328,13 @@ const data = [
         });
     };
 
+    
+
     const init = (selectorApp, title) => {
         const app = document.querySelector(selectorApp);
 
         const { list, logo, btnAdd, formOverlay, form, btnDel, table } = renderPhoneBook(app, title);
-        const allRow = renderContacts(list, data);
+        const allRow = renderContacts(list, getStorage('contactKey'));
         const { closeModal } = modalControl(btnAdd, formOverlay);
 
         hoverRow(allRow, logo);
@@ -345,6 +345,12 @@ const data = [
         closeElem.addEventListener('click', () => {
             formOverlay.classList.remove('is-visible');
         });
+
+        const sortInfo = localStorage.getItem('sortColumnInfo');
+        if (sortInfo !== null) {
+            var tbl = document.querySelector('.table');
+            sortTable(tbl, sortInfo);
+        }
 
 
         table.addEventListener('click', e => {
