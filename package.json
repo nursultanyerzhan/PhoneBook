@@ -1,0 +1,29 @@
+{
+  "name": "phonebook",
+  "version": "1.0.0",
+  "description": "tutorial",
+  "main": "index.js",
+  "scripts": {
+    "start": "set NODE_ENV=development&&webpack serve --open",
+    "dev":"set NODE_ENV=development&&webpack serve",
+    "build":"set NODE_ENV=production&&webpack serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nursultanyerzhan/PhoneBook.git"
+  },
+  "keywords": [
+    "js"
+  ],
+  "author": "nurs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nursultanyerzhan/PhoneBook/issues"
+  },
+  "homepage": "https://github.com/nursultanyerzhan/PhoneBook#readme",
+  "devDependencies": {
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  }
+}
